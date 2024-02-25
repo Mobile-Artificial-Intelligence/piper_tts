@@ -1,0 +1,6 @@
+[submodule "src/piper"]
+	path = src/piper
+	url = https://github.com/danemadsen/piper.git
+[submodule "src/piper-phonemize"]
+	path = src/piper-phonemize
+	url = https://github.com/danemadsen/piper-phonemize.git
