@@ -3,7 +3,10 @@ import 'dart:io';
 
 import 'bindings.dart';
 
+import 'package:ffi/ffi.dart';
+
 class Piper {
+  static String modelPath = '';
   static piper_tts? _lib;
 
   static piper_tts get lib {
@@ -20,5 +23,18 @@ class Piper {
       }
     }
     return _lib!;
+  }
+
+  static File generateSpeech(String text) {
+    if (modelPath.isEmpty) {
+      throw Exception('Model path not set');
+    }
+
+    final path = modelPath.toNativeUtf8().cast<Char>();
+    final prompt = text.toNativeUtf8().cast<Char>();
+
+    final wavFilePath = lib.piper_generate_speech(path, prompt);
+
+    return File.fromUri(Uri.parse(wavFilePath.cast<Utf8>().toDartString()));
   }
 }
