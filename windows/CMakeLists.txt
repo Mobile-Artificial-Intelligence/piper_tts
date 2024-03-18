@@ -21,6 +21,6 @@ add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../src/piper" "${CMAKE_CURRENT_BIN
 set(piper_tts_bundled_libraries
   # Defined in ../src/CMakeLists.txt.
   # This can be changed to accommodate different builds.
-  $<TARGET_FILE:piper_tts>
+  $<TARGET_FILE:piper>
   PARENT_SCOPE
 )

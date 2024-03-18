@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:piper_tts/piper_tts.dart' as piper_tts;
+import 'package:piper_tts/piper_tts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,8 +21,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    sumResult = piper_tts.sum(1, 2);
-    sumAsyncResult = piper_tts.sumAsync(3, 4);
   }
 
   @override
