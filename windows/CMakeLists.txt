@@ -8,8 +8,7 @@ cmake_minimum_required(VERSION 3.14)
 set(PROJECT_NAME "piper_tts")
 project(${PROJECT_NAME} LANGUAGES CXX)
 
-# define the path to espeak-ng-data
-add_definitions(-DESPEAK_NG_DATA_PATH="${CMAKE_INSTALL_LIBDIR}/share/espeak-ng-data")
+add_definitions(-DFLUTTER_BUILD)
 
 # Invoke the build for native code shared with the other target platforms.
 # This can be changed to accommodate different builds.
