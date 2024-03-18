@@ -28,7 +28,7 @@ class Piper {
   static File generateSpeech(String text) {
     if (modelPath.isEmpty) {
       throw Exception('Model path not set');
-    }
+          }
 
     final path = modelPath.toNativeUtf8().cast<Char>();
     final prompt = text.toNativeUtf8().cast<Char>();

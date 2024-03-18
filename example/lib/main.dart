@@ -1,71 +1,87 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
 import 'package:piper_tts/piper_tts.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('Piper TTS Example'),
+        ),
+        body: const TTSPage(),
+      ),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> {
-  late int sumResult;
-  late Future<int> sumAsyncResult;
+class TTSPage extends StatefulWidget {
+  const TTSPage({super.key});
 
   @override
-  void initState() {
-    super.initState();
+  State<TTSPage> createState() => _TTSPageState();
+}
+
+class _TTSPageState extends State<TTSPage> {
+  final TextEditingController _controller = TextEditingController();
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _isPlaying = false;
+
+  void _generateAndPlaySpeech() async {
+    if (_controller.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please enter some text')));
+      return;
+    }
+
+    try {
+      // Generate speech
+      final file = Piper.generateSpeech(_controller.text);
+
+      // Convert the file path to a DeviceFileSource for the play method
+      final source = DeviceFileSource(file.path);
+
+      // Play the generated audio
+      await _audioPlayer.play(source);
+      setState(() {
+        _isPlaying = true;
+      });
+
+      // Listen to the state of the audio player to reset the play state when it finishes playing
+      _audioPlayer.onPlayerComplete.listen((event) {
+        setState(() {
+          _isPlaying = false;
+        });
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(fontSize: 25);
-    const spacerSmall = SizedBox(height: 10);
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Native Packages'),
-        ),
-        body: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            child: Column(
-              children: [
-                const Text(
-                  'This calls a native function through FFI that is shipped as source in the package. '
-                  'The native code is built as part of the Flutter Runner build.',
-                  style: textStyle,
-                  textAlign: TextAlign.center,
-                ),
-                spacerSmall,
-                Text(
-                  'sum(1, 2) = $sumResult',
-                  style: textStyle,
-                  textAlign: TextAlign.center,
-                ),
-                spacerSmall,
-                FutureBuilder<int>(
-                  future: sumAsyncResult,
-                  builder: (BuildContext context, AsyncSnapshot<int> value) {
-                    final displayValue =
-                        (value.hasData) ? value.data : 'loading';
-                    return Text(
-                      'await sumAsync(3, 4) = $displayValue',
-                      style: textStyle,
-                      textAlign: TextAlign.center,
-                    );
-                  },
-                ),
-              ],
+    return Container(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        children: <Widget>[
+          TextField(
+            controller: _controller,
+            decoration: const InputDecoration(
+              hintText: 'Enter text to speak',
             ),
           ),
-        ),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _isPlaying ? null : _generateAndPlaySpeech,
+            child: Text(_isPlaying ? 'Playing...' : 'Generate Speech'),
+          ),
+        ],
       ),
     );
   }
