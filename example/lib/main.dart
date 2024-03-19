@@ -42,7 +42,7 @@ class _TTSPageState extends State<TTSPage> {
 
     try {
       // Generate speech
-      final file = Piper.generateSpeech(_controller.text);
+      final file = await Piper.generateSpeech(_controller.text);
 
       // Convert the file path to a DeviceFileSource for the play method
       final source = DeviceFileSource(file.path);
@@ -54,7 +54,9 @@ class _TTSPageState extends State<TTSPage> {
       });
 
       // Listen to the state of the audio player to reset the play state when it finishes playing
-      _audioPlayer.onPlayerComplete.listen((event) {
+      _audioPlayer.onPlayerComplete.listen((event) async {
+        await Future.delayed(const Duration(milliseconds: 500));
+
         setState(() {
           _isPlaying = false;
         });

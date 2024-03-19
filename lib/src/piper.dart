@@ -25,16 +25,31 @@ class Piper {
     return _lib!;
   }
 
-  static File generateSpeech(String text) {
-    if (modelPath.isEmpty) {
-      throw Exception('Model path not set');
-    }
-
-    final path = modelPath.toNativeUtf8().cast<Char>();
+  static Future<File> generateSpeech(String text) async {
     final prompt = text.toNativeUtf8().cast<Char>();
 
-    final wavFilePath = lib.piper_generate_speech(path, prompt);
+    Pointer<Char> wavFilePath;
+    if (modelPath.isEmpty) {
+      Pointer<Char> path = nullptr;
+      wavFilePath = lib.piper_generate_speech(path, prompt);
+    } else {
+      Pointer<Char> path = modelPath.toNativeUtf8().cast<Char>();
+      wavFilePath = lib.piper_generate_speech(path, prompt);
+    }
 
-    return File.fromUri(Uri.parse(wavFilePath.cast<Utf8>().toDartString()));
+    final file = File.fromUri(Uri.parse(wavFilePath.cast<Utf8>().toDartString()));
+    
+    // Create a 5 second timeout for the file to exist
+    final timeout = DateTime.now().add(const Duration(seconds: 5));
+
+    // wait for the file to exist
+    while (!file.existsSync()) {
+      await Future.delayed(const Duration(milliseconds: 100));
+      if (DateTime.now().isAfter(timeout)) {
+        throw Exception('Failed to generate speech');
+      }
+    }
+
+    return file;
   }
 }
