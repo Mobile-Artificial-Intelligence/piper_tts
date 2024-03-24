@@ -37,8 +37,9 @@ class Piper {
       wavFilePath = lib.piper_generate_speech(path, prompt);
     }
 
-    final file = File.fromUri(Uri.parse(wavFilePath.cast<Utf8>().toDartString()));
-    
+    final filePath = wavFilePath.cast<Utf8>().toDartString();
+    final file = File(filePath);
+
     // Create a 5 second timeout for the file to exist
     final timeout = DateTime.now().add(const Duration(seconds: 5));
 
