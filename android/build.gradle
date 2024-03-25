@@ -24,6 +24,35 @@ rootProject.allprojects {
 
 apply plugin: 'com.android.library'
 
+// Task to write the NDK path to local.properties
+task writeNDKPathToNdkProperties {
+    doLast {
+        try {
+            def ndkPropertiesFile = file("local.properties")
+            Properties properties = new Properties()
+
+            // Log the NDK directory path
+            println "NDK Directory: ${android.ndkDirectory}"
+
+            // Set the ndk.dir property
+            properties.setProperty("ndk.dir", android.ndkDirectory.toString())
+
+            // Attempt to write to local.properties
+            ndkPropertiesFile.withWriter { writer ->
+                properties.store(writer, null)
+            }
+
+            println "Successfully wrote NDK path to local.properties"
+        } catch (Exception e) {
+            println "Failed to write NDK path to local.properties: ${e.message}"
+            e.printStackTrace()
+        }
+    }
+}
+
+// Correctly set preBuild to depend on writeNDKPathToNdkProperties
+preBuild.dependsOn writeNDKPathToNdkProperties
+
 android {
     if (project.android.hasProperty("namespace")) {
         namespace 'com.example.piper_tts'
@@ -42,15 +71,7 @@ android {
     // Invoke the shared CMake build with the Android Gradle Plugin.
     externalNativeBuild {
         cmake {
-            path "../src/piper/CMakeLists.txt"
-
-            // The default CMake version for the Android Gradle Plugin is 3.10.2.
-            // https://developer.android.com/studio/projects/install-ndk#vanilla_cmake
-            //
-            // The Flutter tooling requires that developers have CMake 3.10 or later
-            // installed. You should not increase this version, as doing so will cause
-            // the plugin to fail to compile for some customers of the plugin.
-            // version "3.10.2"
+            path "./CMakeLists.txt"
         }
     }
 
