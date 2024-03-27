@@ -71,7 +71,7 @@ android {
     // Invoke the shared CMake build with the Android Gradle Plugin.
     externalNativeBuild {
         cmake {
-            path "./CMakeLists.txt"
+            path "../src/piper/CMakeLists.txt"
         }
     }
 
